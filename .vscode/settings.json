@@ -1,0 +1,26 @@
+{
+    "[toml]": {
+        "editor.formatOnSave": false
+    },
+    "[markdown]": {
+        "editor.formatOnSave": false
+    },
+    "rust-analyzer.rustfmt.extraArgs": [
+        "+nightly"
+    ],
+    "rust-analyzer.check.allTargets": false,
+    //"rust-analyzer.check.noDefaultFeatures": true,
+    //"rust-analyzer.cargo.noDefaultFeatures": true,
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    // Uncomment the target of your chip.
+    // "rust-analyzer.cargo.target": "thumbv6m-none-eabi",
+    //"rust-analyzer.cargo.target": "thumbv7m-none-eabi",
+    "rust-analyzer.cargo.target": "thumbv7em-none-eabi",
+    //"rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
+    // "rust-analyzer.cargo.target": "thumbv8m.main-none-eabihf",
+    "rust-analyzer.cargo.features": [],
+    "rust-analyzer.linkedProjects": [
+        "stm32-bindings-gen/Cargo.toml",
+        "build/stm32-bindings/Cargo.toml"
+    ],
+}
