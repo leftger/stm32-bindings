@@ -1,4 +1,6 @@
+use std::io::Write;
 use std::{fs, path::PathBuf};
+use tempfile::NamedTempFile;
 
 pub struct Options {
     pub out_dir: PathBuf,
@@ -15,8 +17,19 @@ impl Gen {
     }
 
     pub fn run_gen(&mut self) {
+        let _ = fs::remove_dir_all(self.opts.out_dir.clone());
         fs::create_dir_all(self.opts.out_dir.join("src/bindings")).unwrap();
         fs::create_dir_all(self.opts.out_dir.join("src/lib")).unwrap();
+
+        // Create a named temporary file
+        let mut header = NamedTempFile::new().unwrap();
+
+        // Write some data to the first handle
+        header
+            .write_all(include_bytes!("../inc/wpan-wba.h"))
+            .unwrap();
+
+        header.reopen().unwrap();
 
         // The bindgen::Builder is the main entry point
         // to bindgen, and lets you build up options for
@@ -34,9 +47,19 @@ impl Gen {
             // Unwrap the Result and panic on failure.
             .expect("Unable to generate bindings");
 
+        let out_path = self.opts.out_dir.join("src/bindings/wpan_wba.rs");
+
         bindings
-            .write_to_file(self.opts.out_dir.join("src/bindings/wpan-wba.rs"))
+            .write_to_file(&out_path)
             .expect("Couldn't write bindings!");
+
+        let file_contents = fs::read_to_string(&out_path).unwrap();
+        let file_contents = file_contents
+            .replace("::std::mem::", "::core::mem::")
+            .replace("::std::os::raw::", "::core::ffi::")
+            .replace("::std::option::", "::core::option::");
+
+        fs::write(&out_path, file_contents).unwrap();
 
         // copy misc files
         fs::copy(
@@ -52,6 +75,11 @@ impl Gen {
         )
         .unwrap();
         fs::write(
+            self.opts.out_dir.join("Cargo.toml"),
+            include_bytes!("../res/Cargo.toml"),
+        )
+        .unwrap();
+        fs::write(
             self.opts.out_dir.join("build.rs"),
             include_bytes!("../res/build.rs"),
         )
@@ -59,6 +87,12 @@ impl Gen {
         fs::write(
             self.opts.out_dir.join("src/lib.rs"),
             include_bytes!("../res/src/lib.rs"),
+        )
+        .unwrap();
+
+        fs::write(
+            self.opts.out_dir.join("src/bindings/mod.rs"),
+            include_bytes!("../res/src/bindings/mod.rs"),
         )
         .unwrap();
     }
