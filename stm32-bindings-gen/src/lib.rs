@@ -1,6 +1,20 @@
+use bindgen::callbacks::{ItemInfo, ItemKind, ParseCallbacks};
 use std::io::Write;
 use std::{fs, path::PathBuf};
 use tempfile::NamedTempFile;
+
+#[derive(Debug)]
+struct UppercaseCallbacks;
+
+impl ParseCallbacks for UppercaseCallbacks {
+    fn item_name(&self, item: ItemInfo<'_>) -> Option<String> {
+        if matches!(item.kind, ItemKind::Var) {
+            Some(item.name.to_ascii_uppercase())
+        } else {
+            None
+        }
+    }
+}
 
 pub struct Options {
     pub out_dir: PathBuf,
@@ -35,6 +49,9 @@ impl Gen {
         // to bindgen, and lets you build up options for
         // the resulting bindings.
         let bindings = bindgen::Builder::default()
+            .parse_callbacks(Box::new(UppercaseCallbacks))
+            // Force Clang to use the same 32-bit target layout as the firmware.
+            .clang_args(["--target=thumbv8m.main-none-eabihf", "-mthumb"])
             .clang_arg(format!(
                 "-I{}/Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
                 self.opts.sources_dir.to_str().unwrap()
@@ -53,11 +70,29 @@ impl Gen {
             .write_to_file(&out_path)
             .expect("Couldn't write bindings!");
 
-        let file_contents = fs::read_to_string(&out_path).unwrap();
-        let file_contents = file_contents
+        let mut file_contents = fs::read_to_string(&out_path).unwrap();
+        file_contents = file_contents
             .replace("::std::mem::", "::core::mem::")
             .replace("::std::os::raw::", "::core::ffi::")
             .replace("::std::option::", "::core::option::");
+
+        file_contents = file_contents
+            .lines()
+            .map(|line| {
+                if let Some(rest) = line.strip_prefix("pub const ") {
+                    if let Some((name, tail)) = rest.split_once(':') {
+                        let upper = name.trim().to_ascii_uppercase();
+                        return format!("pub const {}:{}", upper, tail);
+                    }
+                }
+                line.to_owned()
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        if !file_contents.ends_with('\n') {
+            file_contents.push('\n');
+        }
 
         fs::write(&out_path, file_contents).unwrap();
 
