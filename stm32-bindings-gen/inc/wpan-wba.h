@@ -1,4 +1,18 @@
 #include "st_mac_802_15_4_sap.h"
+#include "st_mac_802_15_4_types.h"
+#include "st_mac_802_15_4_core.h"
+#include "st_mac_802_15_4_sys.h"
+#include "st_mac_802_15_4_config.h"
+#include "st_mac_802_15_4_core_config.h"
+#include "st_mac_802_15_4_sys_svc.h"
+#include "st_mac_802_15_4_svc.h"
+#include "st_mac_802_15_4_ext_svc.h"
+#include "st_mac_802_15_4_raw_svc.h"
+#include "st_mac_802_15_4_dbg_svc.h"
+#include "st_mac_buffer_management.h"
+#include "st_mac_queue.h"
+#include "stm_queue.h"
+#include "utilities_common.h"
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_CONF_H
