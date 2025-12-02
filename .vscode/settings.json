@@ -17,7 +17,7 @@
     //"rust-analyzer.cargo.target": "thumbv7m-none-eabi",
     // "rust-analyzer.cargo.target": "thumbv7em-none-eabi",
     //"rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
-    // "rust-analyzer.cargo.target": "thumbv8m.main-none-eabihf",
+    "rust-analyzer.cargo.target": "thumbv8m.main-none-eabihf",
     "rust-analyzer.cargo.features": [],
     "rust-analyzer.linkedProjects": [
         "stm32-bindings-gen/Cargo.toml",
