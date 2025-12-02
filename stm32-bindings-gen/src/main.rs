@@ -11,14 +11,27 @@ fn main() {
         sources_dir,
     };
 
-    let libs = Vec::from([Library {
-        target_triple: String::from("thumbv8m.main-none-eabihf"),
-        sources_dir: "STM32CubeWBA".into(),
-        header: include_bytes!("../inc/wba_wpan_mac.h"),
-        module: "wba_wpan_mac",
-        includes: Vec::from(["Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc".into()]),
-        library: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a".into(),
-    }]);
+    let libs = Vec::from([
+        Library {
+            target_triple: String::from("thumbv8m.main-none-eabihf"),
+            sources_dir: "STM32CubeWBA".into(),
+            header: include_bytes!("../inc/wba_wpan_mac.h"),
+            module: "wba_wpan_mac",
+            includes: Vec::from(["Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc".into()]),
+            library: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a".into(),
+        },
+        Library {
+            target_triple: String::from("thumbv8m.main-none-eabihf"),
+            sources_dir: "STM32CubeWBA".into(),
+            header: include_bytes!("../inc/wba_wpan_ble.h"),
+            module: "wba_wpan_ble",
+            includes: Vec::from([
+                "Middlewares/ST/STM32_WPAN/ble/stack/include".into(),
+                "Middlewares/ST/STM32_WPAN/ble/stack/include/auto".into(),
+            ]),
+            library: "Middlewares/ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_full.a".into(),
+        },
+    ]);
 
     Gen::new(opts, libs).run_gen();
 }

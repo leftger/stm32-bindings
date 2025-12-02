@@ -1,7 +1,7 @@
 use bindgen::callbacks::{ItemInfo, ItemKind, ParseCallbacks};
 use std::io::Write;
 use std::{fs, path::PathBuf};
-use tempfile::NamedTempFile;
+use tempfile::{NamedTempFile, TempDir};
 
 #[derive(Debug)]
 struct UppercaseCallbacks;
@@ -45,6 +45,10 @@ impl Gen {
         fs::create_dir_all(self.opts.out_dir.join("src/bindings")).unwrap();
         fs::create_dir_all(self.opts.out_dir.join("src/lib")).unwrap();
 
+        let tmpdir = TempDir::new().unwrap();
+        fs::write(tmpdir.path().join("string.h"), "").unwrap();
+        // fs::write(tmpdir.path().join("stdint.h"), "").unwrap();
+
         for lib in &self.libs {
             let sources_dir = self.opts.sources_dir.join(&lib.sources_dir);
 
@@ -71,6 +75,8 @@ impl Gen {
                 ));
             }
 
+            builder = builder.clang_arg(&format!("-I{}", tmpdir.path().to_str().unwrap()));
+
             if lib.target_triple.to_ascii_lowercase().starts_with("thumb") {
                 builder = builder.clang_arg("-mthumb");
             }
@@ -96,6 +102,7 @@ impl Gen {
 
             let mut file_contents = fs::read_to_string(&out_path).unwrap();
             file_contents = file_contents
+                .replace(":: std :: mem ::", ":: core :: mem ::")
                 .replace("::std::mem::", "::core::mem::")
                 .replace("::std::os::raw::", "::core::ffi::")
                 .replace("::std::option::", "::core::option::");
