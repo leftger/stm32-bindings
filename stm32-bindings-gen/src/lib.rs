@@ -17,6 +17,10 @@ const STD_TO_CORE_REPLACEMENTS: &[(&str, &str)] = &[
 ];
 
 const NEWLIB_SHARED_OPAQUES: &[&str] = &["_reent", "__sFILE", "__sFILE64"];
+const BINDINGS_FILE_PREAMBLE: &str = "\
+#![allow(clashing_extern_declarations)]\n\
+#![allow(unnecessary_transmutes)]\n\
+";
 
 #[derive(Debug, Clone, Copy)]
 struct BindingSpec {
@@ -297,6 +301,7 @@ impl Gen {
 
         let mut file_contents = bindings.to_string();
         file_contents = Self::normalize_bindings(file_contents);
+        file_contents = format!("{BINDINGS_FILE_PREAMBLE}{file_contents}");
 
         let out_path = self
             .opts
