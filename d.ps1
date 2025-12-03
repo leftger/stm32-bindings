@@ -10,7 +10,7 @@ $REV = "v1.8.0"
 
 Switch ($CMD) {
     "gen" {
-        cargo run --release stm32-bindings-gen
+        cargo run --release stm32-bindings-gen --target thumbv8m.main-none-eabihf
     }
     "download-all" {
         rm -r -Force ./sources/ -ErrorAction SilentlyContinue
