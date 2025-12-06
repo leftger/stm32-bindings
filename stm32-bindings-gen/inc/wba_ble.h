@@ -2,7 +2,8 @@
 #define BLE_WBA_BINDINGS_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdbool.h>
@@ -11,27 +12,6 @@ extern "C" {
 #include "cmsis_compiler.h"
 
 /* Toolchain abstraction utilities */
-
-
-/* Link Layer command interface */
-#include "bsp.h"
-#include "common_types.h"
-#include "dtm.h"
-#include "event_manager.h"
-#include "evnt_schdlr_gnrc_if.h"
-#include "hci.h"
-#include "ll_error.h"
-#include "ll_intf.h"
-#include "ll_intf_cmn.h"
-#include "mac_host_intf.h"
-#include "mem_intf.h"
-#include "os_wrapper.h"
-#include "platform.h"
-#include "power_table.h"
-#include "pta.h"
-#include "ral.h"
-#include "rfd_dev_config.h"
-
 
 /* Core BLE stack */
 #include "blestack.h"

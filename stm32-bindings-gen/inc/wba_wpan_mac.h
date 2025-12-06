@@ -13,6 +13,7 @@
 #include "st_mac_queue.h"
 #include "stm_queue.h"
 #include "utilities_common.h"
+#include "linklayer_plat.h"
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_CONF_H
