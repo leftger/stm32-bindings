@@ -33,16 +33,24 @@ jobs:
         run: ./d download-all
       - name: Run build
         run: cargo run --release --bin stm32-bindings-gen
+      - name: Check wba-linklayer
+        run: cargo check --manifest-path wba-linklayer/Cargo.toml
       - name: Run package build
         run: |
-          cd build/stm32-bindings
           export CARGO_BUILD_TARGET=thumbv8m.main-none-eabihf
-          cargo fix --lib -p stm32-bindings --allow-no-vcs
-          cargo build
-          cargo package
-          ls target/package
+          for crate_dir in linklayer-bindings; do
+            echo "::group::Packaging ${crate_dir}"
+            (
+              cd build/${crate_dir}
+              cargo fix --lib --allow-no-vcs --target ${CARGO_BUILD_TARGET}
+              cargo build --target ${CARGO_BUILD_TARGET}
+              cargo package
+              ls target/package
+            )
+            echo "::endgroup::"
+          done
       - name: Upload package build
         uses: actions/upload-artifact@v4
         with:
           name: crate
-          path: build/stm32-bindings/target/package/*.crate
+          path: build/*-bindings/target/package/*.crate

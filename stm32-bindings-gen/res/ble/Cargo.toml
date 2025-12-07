@@ -1,0 +1,24 @@
+[package]
+name = "ble-bindings"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Raw STM32 WBA BLE stack bindings generated from the ST middleware."
+build = "build.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+linklayer-bindings = { path = "../linklayer-bindings" }
+
+[features]
+default = []
+lib_stm32wba_ble_stack_po = []
+lib_stm32wba_ble_stack_llo = []
+lib_stm32wba_ble_stack_full = []
+lib_stm32wba_ble_stack_basic = []
+lib_stm32wba_ble_stack_basic_plus = []
+lib_lc3 = []
+lib_codec_mngr = []
+lib_ble_audio = []

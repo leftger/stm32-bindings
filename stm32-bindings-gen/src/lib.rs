@@ -21,12 +21,10 @@ const NEWLIB_SHARED_OPAQUES: &[&str] = &["_reent", "__sFILE", "__sFILE64"];
 #[derive(Debug, Clone, Copy)]
 struct BindingSpec {
     module: &'static str,
-    feature: Option<&'static str>,
     header: &'static str,
     include_dirs: &'static [&'static str],
     clang_args: &'static [&'static str],
     allowlist: &'static [&'static str],
-    aliases: &'static [&'static str],
     library_artifacts: &'static [LibraryArtifact],
 }
 
@@ -36,126 +34,133 @@ struct LibraryArtifact {
     destination: &'static str,
 }
 
-const BINDING_SPECS: &[BindingSpec] = &[
-    BindingSpec {
-        module: "wba_link_layer",
-        feature: Some("wba_wpan"),
-        header: "stm32-bindings-gen/inc/link_layer.h",
-        include_dirs: &[
-            "Middlewares/ST/STM32_WPAN",
-            "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
-            "Middlewares/ST/STM32_WPAN/mac_802_15_4/mac_utilities/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ieee_15_4_basic",
-            "Drivers/CMSIS/Core/Include",
-        ],
-        clang_args: &[
-            "-DSUPPORT_MAC=1",
-            "-DSUPPORT_BLE=1",
-            "-DMAC=1",
-            "-DBLE=1",
-            "-DBLE_LL=1",
-            "-DMAC_LAYER=1",
-            "-DSUPPORT_MAC=1",
-            "-DSUPPORT_CONFIG_LIB=1",
-            "-DSUPPORT_OPENTHREAD_1_2=1",
-            "-DSUPPORT_ANT_DIV=1",
-            "-DEXT_ADDRESS_LENGTH=8",
-        ],
-        allowlist: &[],
-        aliases: &[],
-        library_artifacts: &[LibraryArtifact {
-            source: "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/lib",
-            destination: "src/lib/link_layer",
-        }],
-    },
-    BindingSpec {
-        module: "wba_wpan_mac",
-        feature: Some("wba_wpan_mac"),
-        header: "stm32-bindings-gen/inc/wba_wpan_mac.h",
-        include_dirs: &[
-            "Middlewares/ST/STM32_WPAN",
-            "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
-            "Middlewares/ST/STM32_WPAN/mac_802_15_4/mac_utilities/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ieee_15_4_basic",
-            "Drivers/CMSIS/Core/Include",
-        ],
-        clang_args: &["-DSUPPORT_MAC=1", "-DMAC=1", "-DMAC_LAYER=1"],
-        allowlist: &[],
-        aliases: &["mac", "mac_802_15_4", "wpan_wba"],
-        library_artifacts: &[
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib",
-                destination: "src/lib/wba_wpan_mac",
-            },
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a",
-                destination: "src/lib/wba_mac_lib.a",
-            },
-        ],
-    },
-    BindingSpec {
-        module: "wba_ble_stack",
-        feature: Some("wba_wpan_ble"),
-        header: "stm32-bindings-gen/inc/wba_ble.h",
-        include_dirs: &[
-            "Middlewares/ST/STM32_WPAN",
-            "Middlewares/ST/STM32_WPAN/ble/stack/include",
-            "Middlewares/ST/STM32_WPAN/ble/stack/include/auto",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
-            "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic_plus",
-            "Middlewares/ST/STM32_WPAN/ble/audio/Inc",
-            "Middlewares/ST/STM32_WPAN/ble/codec/codec_manager/Inc",
-            "Middlewares/ST/STM32_WPAN/ble/codec/lc3/Inc",
-            "Drivers/CMSIS/Core/Include",
-        ],
-        clang_args: &[
-            "-DBLE=1",
-            "-DBLE_LL=1",
-            "-DSUPPORT_BLE=1",
-            "-DMAC=1",
-            "-DMAC_LAYER=1",
-            "-DSUPPORT_MAC=1",
-            "-DSUPPORT_CONFIG_LIB=1",
-            "-DSUPPORT_OPENTHREAD_1_2=1",
-            "-DSUPPORT_ANT_DIV=1",
-            "-DEXT_ADDRESS_LENGTH=8",
-        ],
-        allowlist: &[],
-        aliases: &["ble", "ble_wba"],
-        library_artifacts: &[
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/ble/stack/lib",
-                destination: "src/lib/ble/stack",
-            },
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/ble/audio/lib",
-                destination: "src/lib/ble/audio",
-            },
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/ble/codec/codec_manager/Lib",
-                destination: "src/lib/ble/codec_manager",
-            },
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/ble/codec/lc3/Lib",
-                destination: "src/lib/ble/lc3",
-            },
-        ],
-    },
-];
+#[derive(Debug, Clone, Copy)]
+struct CrateSpec {
+    name: &'static str,
+    template: &'static str,
+    bindings: &'static [&'static [BindingSpec]],
+}
+
+const LINKLAYER_BINDINGS: &[BindingSpec] = &[BindingSpec {
+    module: "wba_link_layer",
+    header: "stm32-bindings-gen/inc/link_layer.h",
+    include_dirs: &[
+        "Middlewares/ST/STM32_WPAN",
+        "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
+        "Middlewares/ST/STM32_WPAN/mac_802_15_4/mac_utilities/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ieee_15_4_basic",
+        "Drivers/CMSIS/Core/Include",
+    ],
+    clang_args: &[
+        "-DSUPPORT_MAC=1",
+        "-DSUPPORT_BLE=1",
+        "-DMAC=1",
+        "-DBLE=1",
+        "-DBLE_LL=1",
+        "-DMAC_LAYER=1",
+        "-DSUPPORT_MAC=1",
+        "-DSUPPORT_CONFIG_LIB=1",
+        "-DSUPPORT_OPENTHREAD_1_2=1",
+        "-DSUPPORT_ANT_DIV=1",
+        "-DEXT_ADDRESS_LENGTH=8",
+    ],
+    allowlist: &[],
+    library_artifacts: &[LibraryArtifact {
+        source: "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/lib",
+        destination: "src/lib/link_layer",
+    }],
+}];
+
+const BLE_BINDINGS: &[BindingSpec] = &[BindingSpec {
+    module: "wba_ble_stack",
+    header: "stm32-bindings-gen/inc/wba_ble.h",
+    include_dirs: &[
+        "Middlewares/ST/STM32_WPAN",
+        "Middlewares/ST/STM32_WPAN/ble/stack/include",
+        "Middlewares/ST/STM32_WPAN/ble/stack/include/auto",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic_plus",
+        "Middlewares/ST/STM32_WPAN/ble/audio/Inc",
+        "Middlewares/ST/STM32_WPAN/ble/codec/codec_manager/Inc",
+        "Middlewares/ST/STM32_WPAN/ble/codec/lc3/Inc",
+        "Drivers/CMSIS/Core/Include",
+    ],
+    clang_args: &[
+        "-DBLE=1",
+        "-DBLE_LL=1",
+        "-DSUPPORT_BLE=1",
+        "-DMAC=1",
+        "-DMAC_LAYER=1",
+        "-DSUPPORT_MAC=1",
+        "-DSUPPORT_CONFIG_LIB=1",
+        "-DSUPPORT_OPENTHREAD_1_2=1",
+        "-DSUPPORT_ANT_DIV=1",
+        "-DEXT_ADDRESS_LENGTH=8",
+    ],
+    allowlist: &[],
+    library_artifacts: &[
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/ble/stack/lib",
+            destination: "src/lib/ble/stack",
+        },
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/ble/audio/lib",
+            destination: "src/lib/ble/audio",
+        },
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/ble/codec/codec_manager/Lib",
+            destination: "src/lib/ble/codec_manager",
+        },
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/ble/codec/lc3/Lib",
+            destination: "src/lib/ble/lc3",
+        },
+    ],
+}];
+
+const MAC_BINDINGS: &[BindingSpec] = &[BindingSpec {
+    module: "wba_wpan_mac",
+    header: "stm32-bindings-gen/inc/wba_wpan_mac.h",
+    include_dirs: &[
+        "Middlewares/ST/STM32_WPAN",
+        "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
+        "Middlewares/ST/STM32_WPAN/mac_802_15_4/mac_utilities/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_sys/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/ot_inc",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config",
+        "Middlewares/ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ieee_15_4_basic",
+        "Drivers/CMSIS/Core/Include",
+    ],
+    clang_args: &["-DSUPPORT_MAC=1", "-DMAC=1", "-DMAC_LAYER=1"],
+    allowlist: &[],
+    library_artifacts: &[
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib",
+            destination: "src/lib/mac",
+        },
+        LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a",
+            destination: "src/lib/wba_mac_lib.a",
+        },
+    ],
+}];
+
+const CRATE_SPECS: &[CrateSpec] = &[CrateSpec {
+    name: "linklayer-bindings",
+    template: "linklayer",
+    bindings: &[LINKLAYER_BINDINGS, BLE_BINDINGS, MAC_BINDINGS],
+}];
 
 #[derive(Debug)]
 struct UppercaseCallbacks;
@@ -176,23 +181,6 @@ pub struct Options {
     pub target_triple: String,
 }
 
-fn host_isystem_args() -> Vec<String> {
-    let mut args = Vec::new();
-    if cfg!(target_os = "macos") {
-        if let Ok(output) = Command::new("xcrun").arg("--show-sdk-path").output() {
-            if output.status.success() {
-                if let Ok(path) = String::from_utf8(output.stdout) {
-                    let trimmed = path.trim();
-                    if !trimmed.is_empty() {
-                        args.push(format!("-isystem{}/usr/include", trimmed));
-                    }
-                }
-            }
-        }
-    }
-    args
-}
-
 pub struct Gen {
     opts: Options,
 }
@@ -203,81 +191,85 @@ impl Gen {
     }
 
     pub fn run_gen(&mut self) {
+        let base_out_dir = self.compute_base_out_dir();
         println!(
             "Generating bindings into {} for target {}",
-            self.opts.out_dir.display(),
+            base_out_dir.display(),
             self.opts.target_triple
         );
 
-        self.prepare_out_dir();
-        self.write_static_files();
-
-        let mut modules = Vec::new();
-        let mut aliases = Vec::new();
-
-        for spec in BINDING_SPECS {
-            println!("  -> generating `{}` bindings", spec.module);
-            self.generate_bindings_for_spec(spec);
-            self.copy_artifacts_for_spec(spec);
-
-            modules.push((spec.module.to_owned(), spec.feature.map(str::to_owned)));
-            for alias in spec.aliases {
-                aliases.push((
-                    spec.module.to_owned(),
-                    alias.to_string(),
-                    spec.feature.map(str::to_owned),
-                ));
-            }
-        }
-
-        self.write_bindings_mod(&modules, &aliases);
-    }
-
-    fn prepare_out_dir(&self) {
+        // Remove the legacy single-crate output if it still exists.
         let _ = fs::remove_dir_all(&self.opts.out_dir);
-        self.create_dir(self.opts.out_dir.join("src/bindings"));
-        self.create_dir(self.opts.out_dir.join("src/lib"));
-    }
 
-    fn write_static_files(&self) {
-        self.write_bytes("README.md", include_bytes!("../res/README.md"));
-        self.write_bytes("Cargo.toml", include_bytes!("../res/Cargo.toml"));
-        self.write_bytes("build.rs", include_bytes!("../res/build.rs"));
-        self.write_bytes("src/lib.rs", include_bytes!("../res/src/lib.rs"));
-    }
+        for crate_spec in CRATE_SPECS {
+            println!("  -> emitting `{}` crate", crate_spec.name);
+            let crate_out_dir = base_out_dir.join(crate_spec.name);
+            self.prepare_crate_out_dir(crate_spec, &crate_out_dir);
 
-    fn write_bindings_mod(
-        &self,
-        modules: &[(String, Option<String>)],
-        aliases: &[(String, String, Option<String>)],
-    ) {
-        let mut body = String::new();
-        for (module, feature) in modules {
-            if let Some(feature) = feature {
-                body.push_str(&format!("#[cfg(feature = \"{feature}\")]\n"));
-            }
-            body.push_str("pub mod ");
-            body.push_str(module);
-            body.push_str(";\n");
-        }
-        if !aliases.is_empty() {
-            body.push('\n');
-            for (module, alias, feature) in aliases {
-                if let Some(feature) = feature {
-                    body.push_str(&format!("#[cfg(feature = \"{feature}\")]\n"));
+            let mut modules = Vec::new();
+            for binding_group in crate_spec.bindings {
+                for binding in *binding_group {
+                    println!("     - generating `{}` bindings", binding.module);
+                    self.generate_bindings_for_spec(binding, &crate_out_dir);
+                    self.copy_artifacts_for_spec(binding, &crate_out_dir);
+                    modules.push(binding.module);
                 }
-                body.push_str("pub use self::");
-                body.push_str(module);
-                body.push_str(" as ");
-                body.push_str(alias);
-                body.push_str(";\n");
             }
+
+            self.write_bindings_mod(&crate_out_dir, &modules);
         }
-        self.write_string("src/bindings/mod.rs", body);
     }
 
-    fn generate_bindings_for_spec(&self, spec: &BindingSpec) {
+    fn compute_base_out_dir(&self) -> PathBuf {
+        let out_dir = &self.opts.out_dir;
+        if out_dir
+            .file_name()
+            .map(|name| name == "stm32-bindings")
+            .unwrap_or(false)
+        {
+            out_dir
+                .parent()
+                .map(Path::to_path_buf)
+                .unwrap_or_else(|| out_dir.clone())
+        } else {
+            out_dir.clone()
+        }
+    }
+
+    fn prepare_crate_out_dir(&self, spec: &CrateSpec, dest: &Path) {
+        if let Some(parent) = dest.parent() {
+            self.create_dir(parent);
+        }
+
+        let template_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("res")
+            .join(spec.template);
+
+        if !template_root.exists() {
+            panic!(
+                "Template directory `{}` is missing for crate `{}`",
+                template_root.display(),
+                spec.name
+            );
+        }
+
+        let _ = fs::remove_dir_all(dest);
+        self.copy_dir_recursive(&template_root, dest)
+            .unwrap_or_else(|err| {
+                panic!(
+                    "Failed to copy template `{}` into `{}`: {err}",
+                    template_root.display(),
+                    dest.display()
+                )
+            });
+
+        self.create_dir(dest.join("src/bindings"));
+        self.create_dir(dest.join("src/lib"));
+    }
+
+    fn generate_bindings_for_spec(&self, spec: &BindingSpec, crate_dir: &Path) {
         let mut builder = bindgen::Builder::default()
+            .layout_tests(false)
             .parse_callbacks(Box::new(UppercaseCallbacks))
             .header(spec.header)
             .clang_arg(format!("--target={}", self.opts.target_triple));
@@ -325,26 +317,26 @@ impl Gen {
             }
         }
 
-        let bindings = builder
-            .generate()
-            .unwrap_or_else(|err| panic!("Unable to generate bindings for {}: {err}", spec.module));
+        let bindings = builder.generate().unwrap_or_else(|err| {
+            panic!(
+                "Unable to generate bindings for module `{}`: {err}",
+                spec.module
+            )
+        });
 
-        let mut file_contents = bindings.to_string();
-        file_contents = Self::normalize_bindings(file_contents);
+        let mut contents = bindings.to_string();
+        contents = Self::normalize_bindings(contents);
 
-        let out_path = self
-            .opts
-            .out_dir
+        let out_path = crate_dir
             .join("src/bindings")
             .join(format!("{}.rs", spec.module));
-
-        self.write_string_path(&out_path, file_contents);
+        self.write_string_path(&out_path, contents);
     }
 
-    fn copy_artifacts_for_spec(&self, spec: &BindingSpec) {
+    fn copy_artifacts_for_spec(&self, spec: &BindingSpec, crate_dir: &Path) {
         for artifact in spec.library_artifacts {
             let src = self.opts.sources_dir.join(artifact.source);
-            let dst = self.opts.out_dir.join(artifact.destination);
+            let dst = crate_dir.join(artifact.destination);
 
             if src.is_file() {
                 self.copy_lib(&src, &dst)
@@ -361,17 +353,39 @@ impl Gen {
         }
     }
 
-    fn write_bytes(&self, relative: &str, bytes: &[u8]) {
-        let path = self.opts.out_dir.join(relative);
-        if let Some(parent) = path.parent() {
-            self.create_dir(parent);
+    fn write_bindings_mod(&self, crate_dir: &Path, modules: &[&str]) {
+        let mut body = String::new();
+        for module in modules {
+            body.push_str("pub mod ");
+            body.push_str(module);
+            body.push_str(";\n");
         }
-        fs::write(path, bytes).expect("Unable to write bytes");
+
+        let mod_path = crate_dir.join("src/bindings/mod.rs");
+        self.write_string_path(&mod_path, body);
     }
 
-    fn write_string(&self, relative: &str, contents: String) {
-        let path = self.opts.out_dir.join(relative);
-        self.write_string_path(&path, contents);
+    fn copy_dir_recursive(&self, src: &Path, dst: &Path) -> io::Result<()> {
+        if !dst.exists() {
+            fs::create_dir_all(dst)?;
+        }
+
+        for entry in fs::read_dir(src)? {
+            let entry = entry?;
+            let path = entry.path();
+            let target = dst.join(entry.file_name());
+
+            if path.is_dir() {
+                self.copy_dir_recursive(&path, &target)?;
+            } else {
+                if let Some(parent) = target.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::copy(&path, &target)?;
+            }
+        }
+
+        Ok(())
     }
 
     fn write_string_path(&self, path: &Path, mut contents: String) {
@@ -452,6 +466,23 @@ impl Gen {
     fn is_thumb_target(triple: &str) -> bool {
         triple.trim().to_ascii_lowercase().starts_with("thumb")
     }
+}
+
+fn host_isystem_args() -> Vec<String> {
+    let mut args = Vec::new();
+    if cfg!(target_os = "macos") {
+        if let Ok(output) = Command::new("xcrun").arg("--show-sdk-path").output() {
+            if output.status.success() {
+                if let Ok(path) = String::from_utf8(output.stdout) {
+                    let trimmed = path.trim();
+                    if !trimmed.is_empty() {
+                        args.push(format!("-isystem{}/usr/include", trimmed));
+                    }
+                }
+            }
+        }
+    }
+    args
 }
 
 fn arm_sysroot_args() -> Vec<String> {

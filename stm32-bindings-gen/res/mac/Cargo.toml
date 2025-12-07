@@ -1,0 +1,17 @@
+[package]
+name = "mac-bindings"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Raw STM32 WBA IEEE 802.15.4 MAC bindings generated from the ST middleware."
+build = "build.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+linklayer-bindings = { path = "../linklayer-bindings" }
+
+[features]
+default = []
+lib_wba_mac_lib = []

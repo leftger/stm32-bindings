@@ -4,7 +4,8 @@ members = [
     "stm32-bindings-gen",
 ]
 exclude = [
-    "build"
+    "build",
+    "wba-linklayer",
 ]
 
 # Optimize for dev experience: shortest "build+run" time after making a small change.

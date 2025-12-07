@@ -1,0 +1,41 @@
+[package]
+name = "wba-linklayer"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+description = "Shared STM32 WBA link layer utilities used by BLE and MAC wrappers."
+repository = "https://github.com/embassy-rs/stm32-bindings"
+
+[dependencies]
+bitflags = { version = "2", default-features = false }
+linklayer-bindings = { path = "../build/linklayer-bindings" }
+
+[features]
+default = []
+ble = []
+mac = []
+
+# Feature passthrough for selecting ST link-layer static libraries.
+lib_wba5_linklayer_ble_basic_20_links_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_basic_20_links_lib"]
+lib_wba5_linklayer_ble_basic_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_basic_lib"]
+lib_wba5_linklayer_ble_basic_plus_20_links_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_basic_plus_20_links_lib"]
+lib_wba5_linklayer_ble_basic_plus_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_basic_plus_lib"]
+lib_wba5_linklayer_ble_full_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_full_lib"]
+lib_wba5_linklayer_ble_mac_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_mac_lib"]
+lib_wba5_linklayer_ble_peripheral_only_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_peripheral_only_lib"]
+lib_wba5_linklayer_ble_thread_lib = ["linklayer-bindings/lib_wba5_linklayer_ble_thread_lib"]
+lib_wba5_linklayer_rawmac_lib = ["linklayer-bindings/lib_wba5_linklayer_rawmac_lib"]
+lib_wba5_linklayer_thread_lib = ["linklayer-bindings/lib_wba5_linklayer_thread_lib"]
+lib_wba5_linklayer15_4 = ["linklayer-bindings/lib_wba5_linklayer15_4"]
+lib_wba6_linklayer_ble_basic_20_links_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_basic_20_links_lib"]
+lib_wba6_linklayer_ble_basic_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_basic_lib"]
+lib_wba6_linklayer_ble_basic_plus_20_links_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_basic_plus_20_links_lib"]
+lib_wba6_linklayer_ble_basic_plus_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_basic_plus_lib"]
+lib_wba6_linklayer_ble_full_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_full_lib"]
+lib_wba6_linklayer_ble_mac_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_mac_lib"]
+lib_wba6_linklayer_ble_peripheral_only_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_peripheral_only_lib"]
+lib_wba6_linklayer_ble_thread_lib = ["linklayer-bindings/lib_wba6_linklayer_ble_thread_lib"]
+lib_wba6_linklayer_rawmac_lib = ["linklayer-bindings/lib_wba6_linklayer_rawmac_lib"]
+lib_wba6_linklayer_thread_lib = ["linklayer-bindings/lib_wba6_linklayer_thread_lib"]
+lib_wba6_linklayer15_4 = ["linklayer-bindings/lib_wba6_linklayer15_4"]
