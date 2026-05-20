@@ -6,7 +6,7 @@ param (
     [string]$peri
 )
 
-$REV = "v1.8.0"
+$REV = "v1.9.0"
 
 Switch ($CMD) {
     "gen" {
