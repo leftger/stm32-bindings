@@ -15,7 +15,9 @@ Switch ($CMD) {
     "download-all" {
         rm -r -Force ./sources/ -ErrorAction SilentlyContinue
         git clone --branch $REV https://github.com/STMicroelectronics/STM32CubeWBA.git ./sources/STM32CubeWBA/ --depth 1 -q
-        cd ..
+        cd ./sources/STM32CubeWBA/
+        git submodule update --init --recursive -q
+        cd ../..
     }
     default {
         echo "unknown command"

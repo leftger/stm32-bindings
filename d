@@ -14,7 +14,9 @@ case "$CMD" in
     download-all)
         rm -rf ./sources/
         git clone --branch $REV https://github.com/STMicroelectronics/STM32CubeWBA.git ./sources/STM32CubeWBA/ --depth 1 -q
-        cd ./sources/
+        cd ./sources/STM32CubeWBA/
+        git submodule update --init --recursive -q
+        cd ..
     ;;
     *)
         echo "unknown command"
