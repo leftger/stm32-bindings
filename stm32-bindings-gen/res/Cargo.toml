@@ -58,6 +58,7 @@ default = ["pac", "wba_wpan_mac", "wba_wpan_ble"]
 wba_wpan = []
 wba_wpan_mac = []
 wba_wpan_ble = []
+wba_wpan_ble_svc = []
 n6_ai_runtime = []
 
 # Build the actual PAC. Set by default.
