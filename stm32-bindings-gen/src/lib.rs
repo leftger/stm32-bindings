@@ -156,6 +156,20 @@ const BINDING_SPECS: &[BindingSpec] = &[
         ],
     },
     BindingSpec {
+        module: "wba_ble_uuid",
+        feature: Some("wba_wpan_ble_uuid"),
+        header: "stm32-bindings-gen/inc/wba_ble_uuid.h",
+        include_dirs: &[
+            "Middlewares/ST/STM32_WPAN",
+            "Middlewares/ST/STM32_WPAN/ble/svc/Inc",
+            "Drivers/CMSIS/Core/Include",
+        ],
+        clang_args: &[],
+        allowlist: &[],
+        aliases: &["ble_uuid"],
+        library_artifacts: &[],
+    },
+    BindingSpec {
         module: "wba_ble_svc",
         feature: Some("wba_wpan_ble_svc"),
         header: "stm32-bindings-gen/inc/wba_ble_svc.h",
@@ -166,7 +180,7 @@ const BINDING_SPECS: &[BindingSpec] = &[
         ],
         clang_args: &[],
         allowlist: &[],
-        aliases: &[],
+        aliases: &["ble_svc"],
         library_artifacts: &[],
     },
     BindingSpec {

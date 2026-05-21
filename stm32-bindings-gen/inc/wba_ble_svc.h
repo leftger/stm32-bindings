@@ -1,3 +1,2 @@
-/* BLE Services and UUID utilities */
-#include "uuid.h"
+/* BLE Service Control */
 #include "svc_ctl.h"
