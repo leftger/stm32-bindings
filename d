@@ -4,7 +4,7 @@ set -e
 cd $(dirname $0)
 
 CMD=$1
-REV=v1.8.0
+REV=v1.9.0
 shift
 
 case "$CMD" in
@@ -14,7 +14,9 @@ case "$CMD" in
     download-all)
         rm -rf ./sources/
         git clone --branch $REV https://github.com/STMicroelectronics/STM32CubeWBA.git ./sources/STM32CubeWBA/ --depth 1 -q
-        cd ./sources/
+        cd ./sources/STM32CubeWBA/
+        git submodule update --init --recursive -q
+        cd ..
     ;;
     *)
         echo "unknown command"

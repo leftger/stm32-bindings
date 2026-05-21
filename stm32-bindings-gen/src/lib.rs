@@ -155,6 +155,58 @@ const BINDING_SPECS: &[BindingSpec] = &[
             },
         ],
     },
+    BindingSpec {
+        module: "wba_ble_uuid",
+        feature: Some("wba_wpan_ble_uuid"),
+        header: "stm32-bindings-gen/inc/wba_ble_uuid.h",
+        include_dirs: &[
+            "Middlewares/ST/STM32_WPAN",
+            "Middlewares/ST/STM32_WPAN/ble/svc/Inc",
+            "Drivers/CMSIS/Core/Include",
+        ],
+        clang_args: &[],
+        allowlist: &[],
+        aliases: &["ble_uuid"],
+        library_artifacts: &[],
+    },
+    BindingSpec {
+        module: "wba_ble_svc",
+        feature: Some("wba_wpan_ble_svc"),
+        header: "stm32-bindings-gen/inc/wba_ble_svc.h",
+        include_dirs: &[
+            "Middlewares/ST/STM32_WPAN",
+            "Middlewares/ST/STM32_WPAN/ble/svc/Inc",
+            "Drivers/CMSIS/Core/Include",
+        ],
+        clang_args: &[],
+        allowlist: &[],
+        aliases: &["ble_svc"],
+        library_artifacts: &[],
+    },
+    BindingSpec {
+        module: "wba_openthread",
+        feature: Some("wba_wpan_openthread"),
+        header: "stm32-bindings-gen/inc/wba_openthread.h",
+        include_dirs: &[
+            "Middlewares/ST/STM32_WPAN",
+            "Middlewares/ST/STM32_WPAN/thread/openthread/stack/include",
+            "Middlewares/ST/STM32_WPAN/thread/openthread/common",
+            "Middlewares/ST/STM32_WPAN/thread/openthread/config",
+            "Drivers/CMSIS/Core/Include",
+        ],
+        clang_args: &[
+            "-DOPENTHREAD_RADIO_INTERFACE_VERSION=100",
+            "-DOPENTHREAD_CONFIG_ENABLE_ALL_OPTIONAL_ARGS=1",
+        ],
+        allowlist: &[],
+        aliases: &["openthread"],
+        library_artifacts: &[
+            LibraryArtifact {
+                source: "Middlewares/ST/STM32_WPAN/thread/openthread/openthread_lib",
+                destination: "src/lib/openthread",
+            },
+        ],
+    },
 ];
 
 #[derive(Debug)]
