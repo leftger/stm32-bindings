@@ -31,6 +31,19 @@ Switch ($CMD) {
         git submodule update --init --recursive
         cd ../..
     }
+    "build-thread" {
+        mkdir build 2>&1 1> $null
+        rm -r -Force build/thread 2>&1 1> $null
+        mkdir build/thread 2>&1 1> $null
+
+        cp -r stm32-bindings-gen/thread build -ErrorAction SilentlyContinue
+        cd build/thread
+
+        cmake -B build -G Ninja -DCMAKE_C_COMPILER=arm-none-eabi-gcc -DCMAKE_BUILD_TYPE=Release "-DCMAKE_TOOLCHAIN_FILE=arm-gcc-toolchain.cmake"
+        cmake --build build
+
+        cd ../..
+    }
     default {
         echo "unknown command"
     }

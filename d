@@ -27,6 +27,19 @@ case "$CMD" in
         git submodule update --init --recursive
         cd ../..
     ;;
+    build-thread)
+        mkdir -p build
+        rm -rf build/thread 
+        mkdir -p build/thread
+        
+        cp -r stm32-bindings-gen/thread build
+        cd build/thread
+
+        cmake -B build -G Ninja -DCMAKE_C_COMPILER=arm-none-eabi-gcc -DCMAKE_BUILD_TYPE=Release "-DCMAKE_TOOLCHAIN_FILE=arm-gcc-toolchain.cmake"
+        cmake --build build
+
+        cd ../..
+    ;;
     *)
         echo "unknown command"
     ;;

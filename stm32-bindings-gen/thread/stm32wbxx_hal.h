@@ -1,0 +1,1 @@
+#define OPENTHREAD_CONFIG_FILE "stm32wb-openthread-mtd-config.h"

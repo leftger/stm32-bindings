@@ -3,8 +3,8 @@ name = "stm32-bindings"
 version = "0.2.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/embassy-rs/stm32-data"
-description = "Peripheral Access Crate (PAC) for all STM32 chips, including metadata."
+repository = "https://github.com/embassy-rs/stm32-bindings"
+description = "bindings for ST middleware packages."
 
 # `cargo publish` is unable to figure out which .rs files are needed due to the include! magic.
 include = [
