@@ -1,0 +1,1 @@
+void HAL_NVIC_SystemReset();

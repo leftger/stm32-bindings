@@ -31,6 +31,8 @@ jobs:
         run: chmod +x d
       - name: Load sources
         run: ./d download-all
+      - name: Build thread
+        run: ./d build-thread
       - name: Install Rust targets
         run: rustup target add thumbv8m.main-none-eabihf thumbv7em-none-eabi thumbv6m-none-eabi
       - name: Run tests
@@ -57,3 +59,9 @@ jobs:
         with:
           name: crate
           path: build/stm32-bindings/target/package/*.crate
+      - name: Upload thread lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: thread-lib
+          path: build/thread/build/*.a
+
