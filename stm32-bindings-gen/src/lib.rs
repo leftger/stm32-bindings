@@ -1,5 +1,6 @@
 use bindgen::callbacks::{ItemInfo, ItemKind, ParseCallbacks};
 use std::collections::BTreeSet;
+use std::ffi::OsStr;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -226,6 +227,32 @@ const BINDING_SPECS: &[BindingSpec] = &[
             destination: "src/lib/openthread",
         }],
     },
+    BindingSpec {
+        module: "wb_openthread",
+        feature: Some("wb_wpan_openthread"),
+        header: "stm32-bindings-gen/inc/wb_openthread.h",
+        root: Directory::Build("thread"),
+        target_triple: "thumbv7em.main-none-eabihf",
+        include_dirs: &[
+            "build/include",
+            "build/include/openthread",
+            "build/include/openthread/platform",
+            "build/core/openthread_api",
+            "build/core/openthread_config",
+            "build/include/Include",
+            "build/include/Inc",
+        ],
+        clang_args: &[
+            "-DOPENTHREAD_RADIO_INTERFACE_VERSION=100",
+            "-DOPENTHREAD_CONFIG_ENABLE_ALL_OPTIONAL_ARGS=1",
+        ],
+        allowlist: &[],
+        aliases: &["openthread"],
+        library_artifacts: &[LibraryArtifact {
+            source: "build/libopenthread.a",
+            destination: "src/lib/openthread/stm32wb_ot_mtd_lib.a",
+        }],
+    },
 ];
 
 #[derive(Debug)]
@@ -272,7 +299,7 @@ impl Gen {
         Self { opts }
     }
 
-    pub fn run_gen(&mut self) {
+    pub fn run_gen(&mut self, module: &Option<String>) {
         println!("Generating bindings into {}", self.opts.build_dir.display(),);
 
         self.prepare_build_dir();
@@ -282,6 +309,10 @@ impl Gen {
         let mut aliases = Vec::new();
 
         for spec in BINDING_SPECS {
+            if module.as_ref().is_some_and(|module| module != spec.module) {
+                continue;
+            }
+
             println!("  -> generating `{}` bindings", spec.module);
             let sources_dir = match spec.root {
                 Directory::Build(dir) => self.opts.build_dir.join(dir),
@@ -304,10 +335,14 @@ impl Gen {
         self.write_bindings_mod(&modules, &aliases);
     }
 
+    fn build_dir(&self) -> PathBuf {
+        self.opts.build_dir.join("stm32-bindings")
+    }
+
     fn prepare_build_dir(&self) {
-        let _ = fs::remove_dir_all(&self.opts.build_dir);
-        self.create_dir(self.opts.build_dir.join("src/bindings"));
-        self.create_dir(self.opts.build_dir.join("src/lib"));
+        let _ = fs::remove_dir_all(&self.build_dir());
+        self.create_dir(self.build_dir().join("src/bindings"));
+        self.create_dir(self.build_dir().join("src/lib"));
     }
 
     fn write_static_files(&self) {
@@ -353,6 +388,8 @@ impl Gen {
             .header(spec.header)
             .clang_arg(format!("--target={}", spec.target_triple));
 
+        println!("sources dir: {:?}", sources_dir);
+
         for arg in host_isystem_args() {
             builder = builder.clang_arg(arg);
         }
@@ -397,6 +434,7 @@ impl Gen {
         }
 
         let bindings = builder
+            .use_core()
             .layout_tests(false)
             .generate()
             .unwrap_or_else(|err| panic!("Unable to generate bindings for {}: {err}", spec.module));
@@ -405,8 +443,7 @@ impl Gen {
         file_contents = Self::normalize_bindings(file_contents);
 
         let out_path = self
-            .opts
-            .build_dir
+            .build_dir()
             .join("src/bindings")
             .join(format!("{}.rs", spec.module));
 
@@ -416,7 +453,7 @@ impl Gen {
     fn copy_artifacts_for_spec(&self, spec: &BindingSpec, sources_dir: &Path) {
         for artifact in spec.library_artifacts {
             let src = sources_dir.join(artifact.source);
-            let dst = self.opts.build_dir.join(artifact.destination);
+            let dst = self.build_dir().join(artifact.destination);
 
             if src.is_file() {
                 self.copy_lib(&src, &dst)
@@ -434,7 +471,7 @@ impl Gen {
     }
 
     fn write_bytes(&self, relative: &str, bytes: &[u8]) {
-        let path = self.opts.build_dir.join(relative);
+        let path = self.build_dir().join(relative);
         if let Some(parent) = path.parent() {
             self.create_dir(parent);
         }
@@ -442,7 +479,7 @@ impl Gen {
     }
 
     fn write_string(&self, relative: &str, contents: String) {
-        let path = self.opts.build_dir.join(relative);
+        let path = self.build_dir().join(relative);
         self.write_string_path(&path, contents);
     }
 
@@ -464,21 +501,31 @@ impl Gen {
     }
 
     fn copy_lib(&self, src: &Path, dst: &Path) -> io::Result<()> {
+        if !(src.extension().is_some_and(|ext| ext == OsStr::new("a"))) {
+            return Ok(());
+        }
+
         if let Some(parent) = dst.parent() {
             fs::create_dir_all(parent)?;
         }
 
-        let file_name = "lib".to_string()
-            + dst
-                .file_name()
-                .ok_or(io::Error::new(io::ErrorKind::InvalidFilename, ""))?
-                .to_str()
-                .ok_or(io::Error::new(io::ErrorKind::InvalidFilename, ""))?;
+        let dst = if dst
+            .file_name()
+            .is_some_and(|file_name| file_name.to_string_lossy().starts_with("lib"))
+        {
+            dst.to_path_buf()
+        } else {
+            let file_name = "lib".to_string()
+                + dst
+                    .file_name()
+                    .ok_or(io::Error::new(io::ErrorKind::InvalidFilename, ""))?
+                    .to_str()
+                    .ok_or(io::Error::new(io::ErrorKind::InvalidFilename, ""))?;
 
-        let dst = dst
-            .parent()
-            .unwrap_or(&Path::new(""))
-            .join(file_name.to_ascii_lowercase());
+            dst.parent()
+                .unwrap_or(&Path::new(""))
+                .join(file_name.to_ascii_lowercase())
+        };
 
         fs::copy(src, dst)?;
         Ok(())
