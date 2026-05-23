@@ -6,17 +6,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::{env, fs};
 
-const STD_TO_CORE_REPLACEMENTS: &[(&str, &str)] = &[
-    ("::std::mem::", "::core::mem::"),
-    ("::std::os::raw::", "::core::ffi::"),
-    ("::std::option::", "::core::option::"),
-    ("::std::ptr::", "::core::ptr::"),
-    (":: std :: mem ::", ":: core :: mem ::"),
-    (":: std :: os :: raw ::", ":: core :: ffi ::"),
-    (":: std :: option ::", ":: core :: option ::"),
-    (":: std :: ptr ::", ":: core :: ptr ::"),
-];
-
 const NEWLIB_SHARED_OPAQUES: &[&str] = &["_reent", "__sFILE", "__sFILE64"];
 
 #[derive(Debug, Clone, Copy)]
@@ -439,15 +428,12 @@ impl Gen {
             .generate()
             .unwrap_or_else(|err| panic!("Unable to generate bindings for {}: {err}", spec.module));
 
-        let mut file_contents = bindings.to_string();
-        file_contents = Self::normalize_bindings(file_contents);
-
         let out_path = self
             .build_dir()
             .join("src/bindings")
             .join(format!("{}.rs", spec.module));
 
-        self.write_string_path(&out_path, file_contents);
+        self.write_string_path(&out_path, bindings.to_string());
     }
 
     fn copy_artifacts_for_spec(&self, spec: &BindingSpec, sources_dir: &Path) {
@@ -546,26 +532,6 @@ impl Gen {
             }
         }
         Ok(())
-    }
-
-    fn normalize_bindings(mut contents: String) -> String {
-        for (from, to) in STD_TO_CORE_REPLACEMENTS {
-            contents = contents.replace(from, to);
-        }
-
-        contents
-            .lines()
-            .map(|line| {
-                if let Some(rest) = line.strip_prefix("pub const ") {
-                    if let Some((name, tail)) = rest.split_once(':') {
-                        let upper = name.trim().to_ascii_uppercase();
-                        return format!("pub const {}:{}", upper, tail);
-                    }
-                }
-                line.to_owned()
-            })
-            .collect::<Vec<_>>()
-            .join("\n")
     }
 
     fn is_thumb_target(triple: &str) -> bool {

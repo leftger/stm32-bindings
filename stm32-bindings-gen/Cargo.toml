@@ -6,14 +6,14 @@ license = "MIT OR Apache-2.0"
 
 
 [dependencies]
-regex = "1.7.1"
-serde = { version = "1.0.157", features = [ "derive" ] }
-serde_json = "1.0.94"
-proc-macro2 = "1.0.52"
+regex = "1.12.3"
+serde = { version = "1.0.228", features = [ "derive" ] }
+serde_json = "1.0.150"
+proc-macro2 = "1.0.106"
 bindgen = "0.72.1"
-tempfile = "3.23.0"
-clap = { version = "4.0", features = ["derive"] }
+tempfile = "3.27.0"
+clap = { version = "4.6", features = ["derive"] }
 
 [dev-dependencies]
-assert_cmd = "2.0"
-predicates = "3.0"
+assert_cmd = "2.2"
+predicates = "3.1"

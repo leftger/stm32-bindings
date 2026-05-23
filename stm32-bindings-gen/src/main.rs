@@ -8,7 +8,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(
     name = "stm32-bindings-gen",
-    version = "1.0",
+    version = env!("CARGO_PKG_VERSION"),
     about = "Generation of Bindings for STM32 Middlewares"
 )]
 struct Cli {
