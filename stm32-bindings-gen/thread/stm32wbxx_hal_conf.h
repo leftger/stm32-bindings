@@ -1,0 +1,1 @@
+#include "stm32wbxx_hal_def.h"

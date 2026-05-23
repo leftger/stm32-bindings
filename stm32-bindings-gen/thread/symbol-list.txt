@@ -12,7 +12,6 @@ mySTCoapSecureContext
 mySTTcpEndpointHandlerContext
 mySTTcpListenerHandlerContext
 mySTUdpHandlerContext
-OpenThread_CallBack_Processing
 Ot_Cmd_Transfer
 Ot_Cmd_TransferWithNotif
 Post_OtCmdProcessing
@@ -30,7 +29,6 @@ otBackboneRouterNdProxyCb
 otChildSupervisionGetCheckFailureCounter
 otChildSupervisionGetCheckTimeout
 otChildSupervisionGetInterval
-otChildSupervisionResetCheckFailureCounter
 otChildSupervisionSetCheckTimeout
 otChildSupervisionSetInterval
 otCoapAddResource
@@ -75,7 +73,6 @@ otCoapSecureIsConnected
 otCoapSecureIsConnectionActive
 otCoapSecureRemoveResource
 otCoapSecureSendRequest
-otCoapSecureSendResponse
 otCoapSecureSetClientConnectEventCallback
 otCoapSecureSetDefaultHandler
 otCoapSecureSetSslAuthMode
@@ -83,7 +80,6 @@ otCoapSecureStart
 otCoapSecureStartWithMaxConnAttempts
 otCoapSecureStop
 otCoapSendRequestWithParameters
-otCoapSendResponseWithParameters
 otCoapSetDefaultHandler
 otCoapStart
 otCoapStop
@@ -91,8 +87,6 @@ otCommissionerEnergyReportCb
 otCommissionerJoinerCb
 otCommissionerPanIdConflictCb
 otCommissionerStateCb
-otConvertDurationInSecondsToString
-otCryptoAesCcm
 otCryptoHmacSha256
 otDatasetConvertToTlvs
 otDatasetGetActive
@@ -112,7 +106,6 @@ otDatasetSetActiveTlvs
 otDatasetSetPending
 otDatasetSetPendingTlvs
 otDatasetUpdaterCb
-otDatasetUpdateTlvs
 otDetachGracefullyCb
 otDnsAddressCb
 otDnsAddressResponseGetAddress
@@ -134,27 +127,22 @@ otDnsGetNextTxtEntry
 otDnsInitTxtEntryIterator
 otDnsIsNameCompressionEnabled
 otDnsRecordResponseGetQueryName
-otDnsRecordResponseGetRecordInfo
 otDnsServiceCb
 otDnsServiceResponseGetHostAddress
 otDnsServiceResponseGetServiceInfo
 otDnsServiceResponseGetServiceName
 otDnsSetNameCompressionEnabled
 otDumpCritPlat
-otDumpDebgPlat
 otDumpInfoPlat
 otDumpNotePlat
 otDumpWarnPlat
-otGetRadioVersionString
 otGetVersionString
 otHandleActiveScanResultCb
 otHandleEnergyScanResultCb
 otHeapCAlloc
-otHeapFree
 otIcmp6GetEchoMode
 otIcmp6ReceiveCb
 otIcmp6RegisterHandler
-otIcmp6SendEchoRequest
 otIcmp6SetEchoMode
 otInstanceErasePersistentInfo
 otInstanceFactoryReset
@@ -197,7 +185,6 @@ otIp6RegisterMulticastListenersCb
 otIp6RemoveAllUnsecurePorts
 otIp6RemoveUnicastAddress
 otIp6RemoveUnsecurePort
-otIp6ResetBorderRoutingCounters
 otIp6SelectSourceAddress
 otIp6Send
 otIp6SetAddressCallback
@@ -217,7 +204,6 @@ otJoinerGetId
 otJoinerGetState
 otJoinerSetDiscerner
 otJoinerStart
-otJoinerStateToString
 otJoinerStop
 otLinkActiveScan
 otLinkConvertLinkQualityToRss
@@ -264,7 +250,6 @@ otLinkMetricsMgmtResponseCb
 otLinkMetricsMgmtResponseCb1
 otLinkMetricsQuery
 otLinkMetricsReportCb
-otLinkMetricsSendLinkProbe
 otLinkPcapCb
 otLinkRawEnergyScanDoneCb
 otLinkRawReceiveDoneCb
@@ -285,7 +270,6 @@ otLinkSetPcapCallback
 otLinkSetPollPeriod
 otLinkSetPromiscuous
 otLinkSetRadioFilterEnabled
-otLinkSetRegion
 otLinkSetSupportedChannelMask
 otLogGenerateNextHexDumpLine
 otLoggingGetLevel
@@ -303,7 +287,6 @@ otMessageQueueGetHead
 otMessageQueueGetNext
 otMessageQueueInit
 otMessageRead
-otMessageResetBufferInfo
 otMessageSetDirectTransmission
 otMessageSetLength
 otMessageSetOffset
@@ -313,7 +296,6 @@ otNat64GetPrefixManagerState
 otNat64InitAddressMappingIterator
 otNat64Send
 otNat64SetIp4Cidr
-otNat64SynthesizeIp6Address
 otNetDataGet
 otNetDataGetCommissioningDataset
 otNetDataGetLength
@@ -326,20 +308,16 @@ otNetDataGetStableVersion
 otNetDataGetVersion
 otNetDataResetMaxLength
 otNetDataSteeringDataCheckJoiner
-otNetDataSteeringDataCheckJoinerWithDiscerner
 otNetworkNameFromString
 otNetworkTimeSyncCb
 otPingSenderPing
 otPingSenderReplyCb
 otPingSenderStatisticsCb
-otPingSenderStop
 otPlatRadioGetCslAccuracy
-otPlatRadioGetCslUncertainty
 otPlatRadioGetTransmitPower
 otPlatRadioSetChannelTargetPower
 otPlatRadioSetTransmitPower
 otRandomCryptoFillBuffer
-otRandomNonCryptoAddJitter
 otRandomNonCryptoFillBuffer
 otRandomNonCryptoGetUint16
 otRandomNonCryptoGetUint16InRange
@@ -351,7 +329,6 @@ otRemoveStateChangeCallback
 otServerAddService
 otServerGetNetDataLocal
 otServerGetNextService
-otServerRegister
 otServerRemoveService
 otSetStateChangedCallback
 otSntpResponseHandlerCb
@@ -365,7 +342,6 @@ otSrpClientBuffersGetHostNameString
 otSrpClientBuffersGetServiceEntryInstanceNameString
 otSrpClientBuffersGetServiceEntryServiceNameString
 otSrpClientBuffersGetServiceEntryTxtBuffer
-otSrpClientBuffersGetSubTypeLabelsArray
 otSrpClientCb
 otSrpClientClearHostAndServices
 otSrpClientClearService
@@ -381,7 +357,6 @@ otSrpClientGetServices
 otSrpClientGetTtl
 otSrpClientIsAutoStartModeEnabled
 otSrpClientIsRunning
-otSrpClientIsServiceKeyRecordEnabled
 otSrpClientItemStateToString
 otSrpClientRemoveHostAndServices
 otSrpClientRemoveService
@@ -420,11 +395,9 @@ otTcpForwardProgressCb
 otTcpGetLocalAddress
 otTcpGetPeerAddress
 otTcpListen
-otTcpListenerDeinitialize
 otTcpListenerGetContext
 otTcpListenerGetInstance
 otTcpListenerInitialize
-otTcpMbedTlsSslRecvCallback
 otTcpMbedTlsSslSendCallback
 otTcpReceiveAvailableCb
 otTcpReceiveByReference
@@ -494,7 +467,6 @@ otThreadSetLinkMode
 otThreadSetMeshLocalPrefix
 otThreadSetNetworkKey
 otThreadSetNetworkName
-otThreadSetNonPreferredChannels
 otThreadSetVendorAppUrl
 otThreadSetVendorModel
 otThreadSetVendorName
@@ -503,7 +475,6 @@ otUdpAddReceiver
 otUdpBind
 otUdpClose
 otUdpConnect
-otUdpGetSockets
 otUdpHandlerCb
 otUdpIsOpen
 otUdpIsPortInUse
