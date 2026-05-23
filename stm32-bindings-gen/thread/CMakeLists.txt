@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(openthread)
 
 
-set(SOURCES "../../sources")
-set(STM32_WPAN "${SOURCES}/STM32CubeWB/Middlewares/ST/STM32_WPAN")
+set(SOURCES "../../sources/STM32CubeWB")
+set(STM32_WPAN "${SOURCES}/Middlewares/ST/STM32_WPAN")
 set(OPENTHREAD_STACK "${STM32_WPAN}/thread/openthread/stack")
 set(INTERFACE_PATTERNS "${STM32_WPAN}/interface/patterns/ble_thread")
 
@@ -21,8 +21,8 @@ file(COPY "${INTERFACE_PATTERNS}/tl/tl.h"                                   DEST
 file(COPY "${INTERFACE_PATTERNS}/tl/mbox_def.h"                             DESTINATION "include")
 file(COPY "${INTERFACE_PATTERNS}/shci/shci.h"                               DESTINATION "include")
 file(COPY "${INTERFACE_PATTERNS}/shci/shci.h"                               DESTINATION "include")
-file(COPY "${SOURCES}/STM32CubeWB/Drivers/CMSIS/Include"                    DESTINATION "include")
-
+file(COPY "${SOURCES}/Drivers/CMSIS/Include"                                DESTINATION "include")
+file(COPY "${SOURCES}/Drivers/STM32WBxx_HAL_Driver/Inc"                     DESTINATION "include")
 
 file(
     GLOB SRC_FILES CONFIGURE_DEPENDS
@@ -30,6 +30,15 @@ file(
 )
 
 add_library(openthread STATIC ${SRC_FILES}) 
+
+target_compile_definitions(
+    openthread
+    PRIVATE
+    __ARMCC_VERSION
+    CFG_TIM_PROC_ID_ISR=10
+    OPENTHREAD_CONFIG_FILE="openthread_api_config_mtd.h"
+    OPENTHREAD_PROJECT_CORE_CONFIG_FILE="stm32wb-openthread-mtd-config.h"
+)
 
 target_include_directories(
     openthread 
@@ -39,7 +48,8 @@ target_include_directories(
     "${CMAKE_CURRENT_BINARY_DIR}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include/openthread"
     "${CMAKE_CURRENT_BINARY_DIR}/include/openthread/platform"
-    "${CMAKE_CURRENT_BINARY_DIR}/include/Include"
     "${CMAKE_CURRENT_BINARY_DIR}/core/openthread_api"
     "${CMAKE_CURRENT_BINARY_DIR}/core/openthread_config"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/Include"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/Inc"
 )
