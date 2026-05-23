@@ -34,8 +34,6 @@ add_library(openthread STATIC ${SRC_FILES})
 target_compile_definitions(
     openthread
     PRIVATE
-    __ARMCC_VERSION
-    CFG_TIM_PROC_ID_ISR=10
     OPENTHREAD_CONFIG_FILE="openthread_api_config_mtd.h"
     OPENTHREAD_PROJECT_CORE_CONFIG_FILE="stm32wb-openthread-mtd-config.h"
 )
