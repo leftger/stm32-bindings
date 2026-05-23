@@ -19,10 +19,19 @@ const STD_TO_CORE_REPLACEMENTS: &[(&str, &str)] = &[
 const NEWLIB_SHARED_OPAQUES: &[&str] = &["_reent", "__sFILE", "__sFILE64"];
 
 #[derive(Debug, Clone, Copy)]
+enum Directory {
+    Sources(&'static str),
+    #[allow(dead_code)]
+    Build(&'static str),
+}
+
+#[derive(Debug, Clone, Copy)]
 struct BindingSpec {
     module: &'static str,
     feature: Option<&'static str>,
     header: &'static str,
+    root: Directory,
+    target_triple: &'static str,
     include_dirs: &'static [&'static str],
     clang_args: &'static [&'static str],
     allowlist: &'static [&'static str],
@@ -41,6 +50,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_link_layer",
         feature: Some("wba_wpan"),
         header: "stm32-bindings-gen/inc/link_layer.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
@@ -77,6 +88,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_wpan_mac",
         feature: Some("wba_wpan_mac"),
         header: "stm32-bindings-gen/inc/wba_wpan_mac.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/mac_802_15_4/core/inc",
@@ -107,6 +120,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_ble_stack",
         feature: Some("wba_wpan_ble"),
         header: "stm32-bindings-gen/inc/wba_ble.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/ble/stack/include",
@@ -159,6 +174,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_ble_uuid",
         feature: Some("wba_wpan_ble_uuid"),
         header: "stm32-bindings-gen/inc/wba_ble_uuid.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/ble/svc/Inc",
@@ -173,6 +190,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_ble_svc",
         feature: Some("wba_wpan_ble_svc"),
         header: "stm32-bindings-gen/inc/wba_ble_svc.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/ble/svc/Inc",
@@ -187,6 +206,8 @@ const BINDING_SPECS: &[BindingSpec] = &[
         module: "wba_openthread",
         feature: Some("wba_wpan_openthread"),
         header: "stm32-bindings-gen/inc/wba_openthread.h",
+        root: Directory::Sources("STM32CubeWBA"),
+        target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &[
             "Middlewares/ST/STM32_WPAN",
             "Middlewares/ST/STM32_WPAN/thread/openthread/stack/include",
@@ -200,12 +221,10 @@ const BINDING_SPECS: &[BindingSpec] = &[
         ],
         allowlist: &[],
         aliases: &["openthread"],
-        library_artifacts: &[
-            LibraryArtifact {
-                source: "Middlewares/ST/STM32_WPAN/thread/openthread/openthread_lib",
-                destination: "src/lib/openthread",
-            },
-        ],
+        library_artifacts: &[LibraryArtifact {
+            source: "Middlewares/ST/STM32_WPAN/thread/openthread/openthread_lib",
+            destination: "src/lib/openthread",
+        }],
     },
 ];
 
@@ -223,9 +242,8 @@ impl ParseCallbacks for UppercaseCallbacks {
 }
 
 pub struct Options {
-    pub out_dir: PathBuf,
+    pub build_dir: PathBuf,
     pub sources_dir: PathBuf,
-    pub target_triple: String,
 }
 
 fn host_isystem_args() -> Vec<String> {
@@ -255,13 +273,9 @@ impl Gen {
     }
 
     pub fn run_gen(&mut self) {
-        println!(
-            "Generating bindings into {} for target {}",
-            self.opts.out_dir.display(),
-            self.opts.target_triple
-        );
+        println!("Generating bindings into {}", self.opts.build_dir.display(),);
 
-        self.prepare_out_dir();
+        self.prepare_build_dir();
         self.write_static_files();
 
         let mut modules = Vec::new();
@@ -269,8 +283,13 @@ impl Gen {
 
         for spec in BINDING_SPECS {
             println!("  -> generating `{}` bindings", spec.module);
-            self.generate_bindings_for_spec(spec);
-            self.copy_artifacts_for_spec(spec);
+            let sources_dir = match spec.root {
+                Directory::Build(dir) => self.opts.build_dir.join(dir),
+                Directory::Sources(dir) => self.opts.sources_dir.join(dir),
+            };
+
+            self.generate_bindings_for_spec(spec, &sources_dir);
+            self.copy_artifacts_for_spec(spec, &sources_dir);
 
             modules.push((spec.module.to_owned(), spec.feature.map(str::to_owned)));
             for alias in spec.aliases {
@@ -285,10 +304,10 @@ impl Gen {
         self.write_bindings_mod(&modules, &aliases);
     }
 
-    fn prepare_out_dir(&self) {
-        let _ = fs::remove_dir_all(&self.opts.out_dir);
-        self.create_dir(self.opts.out_dir.join("src/bindings"));
-        self.create_dir(self.opts.out_dir.join("src/lib"));
+    fn prepare_build_dir(&self) {
+        let _ = fs::remove_dir_all(&self.opts.build_dir);
+        self.create_dir(self.opts.build_dir.join("src/bindings"));
+        self.create_dir(self.opts.build_dir.join("src/lib"));
     }
 
     fn write_static_files(&self) {
@@ -328,11 +347,11 @@ impl Gen {
         self.write_string("src/bindings/mod.rs", body);
     }
 
-    fn generate_bindings_for_spec(&self, spec: &BindingSpec) {
+    fn generate_bindings_for_spec(&self, spec: &BindingSpec, sources_dir: &Path) {
         let mut builder = bindgen::Builder::default()
             .parse_callbacks(Box::new(UppercaseCallbacks))
             .header(spec.header)
-            .clang_arg(format!("--target={}", self.opts.target_triple));
+            .clang_arg(format!("--target={}", spec.target_triple));
 
         for arg in host_isystem_args() {
             builder = builder.clang_arg(arg);
@@ -342,7 +361,7 @@ impl Gen {
         builder = builder.clang_arg(format!("-iquote{}", crate_inc.display()));
         builder = builder.clang_arg(format!("-I{}", crate_inc.display()));
 
-        if Self::is_thumb_target(&self.opts.target_triple) {
+        if Self::is_thumb_target(&spec.target_triple) {
             builder = builder.clang_arg("-mthumb");
         }
 
@@ -351,7 +370,7 @@ impl Gen {
             let resolved = if include_path.is_absolute() {
                 include_path.to_path_buf()
             } else {
-                self.opts.sources_dir.join(include_path)
+                sources_dir.join(include_path)
             };
             builder = builder.clang_arg(format!("-I{}", resolved.display()));
         }
@@ -387,17 +406,17 @@ impl Gen {
 
         let out_path = self
             .opts
-            .out_dir
+            .build_dir
             .join("src/bindings")
             .join(format!("{}.rs", spec.module));
 
         self.write_string_path(&out_path, file_contents);
     }
 
-    fn copy_artifacts_for_spec(&self, spec: &BindingSpec) {
+    fn copy_artifacts_for_spec(&self, spec: &BindingSpec, sources_dir: &Path) {
         for artifact in spec.library_artifacts {
-            let src = self.opts.sources_dir.join(artifact.source);
-            let dst = self.opts.out_dir.join(artifact.destination);
+            let src = sources_dir.join(artifact.source);
+            let dst = self.opts.build_dir.join(artifact.destination);
 
             if src.is_file() {
                 self.copy_lib(&src, &dst)
@@ -415,7 +434,7 @@ impl Gen {
     }
 
     fn write_bytes(&self, relative: &str, bytes: &[u8]) {
-        let path = self.opts.out_dir.join(relative);
+        let path = self.opts.build_dir.join(relative);
         if let Some(parent) = path.parent() {
             self.create_dir(parent);
         }
@@ -423,7 +442,7 @@ impl Gen {
     }
 
     fn write_string(&self, relative: &str, contents: String) {
-        let path = self.opts.out_dir.join(relative);
+        let path = self.opts.build_dir.join(relative);
         self.write_string_path(&path, contents);
     }
 
