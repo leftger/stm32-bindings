@@ -424,6 +424,9 @@ impl Gen {
 
         let bindings = builder
             .use_core()
+            .enable_function_attribute_detection()
+            .derive_debug(false)
+            .derive_default(true)
             .layout_tests(false)
             .generate()
             .unwrap_or_else(|err| panic!("Unable to generate bindings for {}: {err}", spec.module));
