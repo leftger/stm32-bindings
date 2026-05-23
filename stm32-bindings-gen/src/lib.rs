@@ -336,7 +336,13 @@ impl Gen {
 
     fn write_static_files(&self) {
         self.write_bytes("README.md", include_bytes!("../res/README.md"));
-        self.write_bytes("Cargo.toml", include_bytes!("../res/Cargo.toml"));
+        self.write_bytes(
+            "Cargo.toml",
+            str::from_utf8(include_bytes!("../res/Cargo.toml"))
+                .unwrap()
+                .replace("$VERSION$", env!("CARGO_PKG_VERSION"))
+                .as_bytes(),
+        );
         self.write_bytes("build.rs", include_bytes!("../res/build.rs"));
         self.write_bytes("src/lib.rs", include_bytes!("../res/src/lib.rs"));
     }
