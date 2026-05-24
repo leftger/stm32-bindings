@@ -42,18 +42,14 @@ jobs:
       - name: Check generated crate targets
         run: |
           cd build/stm32-bindings
-          for target in thumbv7em-none-eabi thumbv6m-none-eabi; do
+          for target in thumbv7em-none-eabi thumbv6m-none-eabi thumbv8m.main-none-eabihf; do
             echo "Checking target $target"
             cargo check --target "$target" --no-default-features --features pac
           done
       - name: Run package build
         run: |
           cd build/stm32-bindings
-          export CARGO_BUILD_TARGET=thumbv8m.main-none-eabihf
-          cargo fix --lib -p stm32-bindings --allow-no-vcs
-          cargo build
-          cargo package
-          ls target/package
+          cargo package --target thumbv8m.main-none-eabihf
       - name: Upload package build
         uses: actions/upload-artifact@v5
         with:
