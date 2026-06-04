@@ -1,10 +1,15 @@
 use bindgen::callbacks::{ItemInfo, ItemKind, ParseCallbacks};
+use lazy_regex::regex;
+use proc_macro2::TokenStream;
+use quote::ToTokens;
 use std::collections::BTreeSet;
 use std::ffi::OsStr;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::{env, fs};
+use syn::fold::Fold;
+use syn::{ForeignItem, ForeignItemFn, ItemForeignMod};
 
 const NEWLIB_SHARED_OPAQUES: &[&str] = &["_reent", "__sFILE", "__sFILE64"];
 
@@ -279,6 +284,54 @@ fn host_isystem_args() -> Vec<String> {
     args
 }
 
+/// Removes matching functions
+struct ForeignFnsRemover<'a> {
+    regex: &'a regex::Regex,
+}
+
+impl<'a> Fold for ForeignFnsRemover<'a> {
+    fn fold_item_foreign_mod(&mut self, mut node: ItemForeignMod) -> ItemForeignMod {
+        // First, recursively fold subnodes
+        node = syn::fold::fold_item_foreign_mod(self, node);
+
+        // Then filter out matching functions
+        node.items.retain(|item| {
+            if let ForeignItem::Fn(ForeignItemFn { sig, .. }) = item {
+                let name = sig.ident.to_string();
+                !self.regex.is_match(&name)
+            } else {
+                true
+            }
+        });
+
+        node
+    }
+}
+
+/// Transforms the functions to uppercase
+struct LinkNameAttrAdder<'a> {
+    regex: &'a regex::Regex,
+}
+
+impl<'a> Fold for LinkNameAttrAdder<'a> {
+    fn fold_foreign_item_fn(&mut self, mut func: ForeignItemFn) -> ForeignItemFn {
+        let fn_name = func.sig.ident.to_string();
+        // Only add if not already present
+        if !func.attrs.iter().any(|a| a.path().is_ident("link_name"))
+            && self.regex.is_match(&fn_name)
+        {
+            let link_name_value = fn_name.to_uppercase();
+
+            func.attrs.push(syn::parse_quote!(
+                #[link_name = #link_name_value]
+            ));
+        }
+
+        // Recurse into the function body (nested functions in blocks)
+        syn::fold::fold_foreign_item_fn(self, func)
+    }
+}
+
 pub struct Gen {
     opts: Options,
 }
@@ -442,7 +495,20 @@ impl Gen {
             .join("src/bindings")
             .join(format!("{}.rs", spec.module));
 
-        self.write_string_path(&out_path, bindings.to_string());
+        let file = syn::parse_file(&bindings.to_string()).unwrap();
+        let file = LinkNameAttrAdder {
+            regex: &*regex!("^(aci|hal|hci)_.*"),
+        }
+        .fold_file(file);
+        let file = ForeignFnsRemover {
+            regex: &*regex!("^(ACI|HAL|HCI)_.*"),
+        }
+        .fold_file(file);
+
+        self.write_string_path(
+            &out_path,
+            self.format_tokens(file.into_token_stream()).unwrap(),
+        );
     }
 
     fn copy_artifacts_for_spec(&self, spec: &BindingSpec, sources_dir: &Path) {
@@ -463,6 +529,34 @@ impl Gen {
                 );
             }
         }
+    }
+
+    fn format_tokens(&self, tokens: TokenStream) -> io::Result<String> {
+        // Convert AST back to a token stream
+        let tokens = tokens.to_string();
+
+        // Format using rustfmt
+        let mut rustfmt = Command::new("rustfmt")
+            .arg("--emit")
+            .arg("stdout")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+
+        {
+            let stdin = rustfmt
+                .stdin
+                .as_mut()
+                .ok_or(io::Error::other("Failed to open rustfmt stdin"))?;
+            stdin.write_all(tokens.as_bytes())?;
+        }
+
+        let output = rustfmt.wait_with_output()?;
+        if !output.status.success() {
+            return Err(io::Error::other("rustfmt failed"));
+        }
+
+        String::from_utf8(output.stdout).map_err(|e| io::Error::other(e))
     }
 
     fn write_bytes(&self, relative: &str, bytes: &[u8]) {
