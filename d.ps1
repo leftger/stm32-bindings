@@ -11,7 +11,7 @@ $WB_REV = ((Select-String -Path ".\d" -Pattern "^WB_REV=") -split "=")[1]
 
 Switch ($CMD) {
     "gen" {
-        cargo run --release stm32-bindings-gen --target thumbv8m.main-none-eabihf
+        cargo run --release
     }
     "download-all" {
         while (Test-Path "sources") {
