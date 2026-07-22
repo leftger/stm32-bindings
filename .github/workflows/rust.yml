@@ -57,7 +57,8 @@ jobs:
       - name: Build NemaGFX HAL and smoke example
         run: |
           cargo build -p nema-gfx-hal
-          cargo build --manifest-path examples/nema-gfx-smoke/Cargo.toml
+          cd examples/nema-gfx-smoke
+          cargo build
       - name: Run package build
         run: |
           cd build/stm32-bindings
