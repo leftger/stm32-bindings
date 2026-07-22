@@ -54,6 +54,10 @@ jobs:
           cargo check --target thumbv8m.main-none-eabihf --no-default-features --features nema_gfx,lib_nemagfx_cortex_m55_float_abi_hard
           cargo check --target thumbv8m.main-none-eabihf --no-default-features --features nema_gfx,lib_nemagfx_cortex_m33_revc_float_abi_hard
           cargo check --target thumbv7em-none-eabihf --no-default-features --features nema_gfx,lib_nemagfx_cortex_m7_float_abi_hard
+      - name: Build NemaGFX HAL and smoke example
+        run: |
+          cargo build -p nema-gfx-hal
+          cargo build --manifest-path examples/nema-gfx-smoke/Cargo.toml
       - name: Run package build
         run: |
           cd build/stm32-bindings

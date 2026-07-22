@@ -121,3 +121,9 @@ lib_nemagfx_cortex_m33_revc_float_abi_hard = []
 lib_nemagfx_cortex_m33_nemapvg_float_abi_hard = []
 lib_nemagfx_cortex_m7_float_abi_hard = []
 lib_nemagfx_cortex_m55_float_abi_hard = []
+
+# NemaGFX / NeoChrom presets (module + matching prebuilt library).
+neochrom-m33-revc = ["nema_gfx", "lib_nemagfx_cortex_m33_revc_float_abi_hard"]
+neochrom-m33-nemapvg = ["nema_gfx", "lib_nemagfx_cortex_m33_nemapvg_float_abi_hard"]
+neochrom-m7 = ["nema_gfx", "lib_nemagfx_cortex_m7_float_abi_hard"]
+neochrom-m55 = ["nema_gfx", "lib_nemagfx_cortex_m55_float_abi_hard"]

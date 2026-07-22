@@ -34,11 +34,33 @@ stm32-bindings = { default-features = false, features = [
 
 All shipped variants use the GCC **hard-float** ABI (`libnemagfx-float-abi-hard.a`), renamed on fetch to avoid filename collisions across cores.
 
+### Presets
+
+| Feature | Equivalent lib feature | Typical parts |
+|---------|------------------------|---------------|
+| `neochrom-m33-revc` | `lib_nemagfx_cortex_m33_revc_float_abi_hard` | STM32U5x7/x9 |
+| `neochrom-m33-nemapvg` | `lib_nemagfx_cortex_m33_nemapvg_float_abi_hard` | STM32U5F9/U5G9 |
+| `neochrom-m7` | `lib_nemagfx_cortex_m7_float_abi_hard` | STM32H7R7/H7S7 |
+| `neochrom-m55` | `lib_nemagfx_cortex_m55_float_abi_hard` | STM32N6xx |
+
+Enable **exactly one** NemaGFX library (via a preset or a single `lib_nemagfx_*` feature). `build.rs` rejects linking multiple core variants at once.
+
 ## Platform HAL (required)
 
-NemaGFX expects a platform HAL (`nema_sys_init`, `nema_reg_read`/`write`, `nema_buffer_*`, `nema_wait_irq`, …). ST provides templates in the upstream `Middleware/NemaGFX/templates/` directory. **You must implement and link this separately** — it is not part of `stm32-bindings`.
+NemaGFX expects a platform HAL (`nema_sys_init`, `nema_reg_read`/`write`, `nema_buffer_*`, `nema_wait_irq`, …). ST provides templates in the upstream `Middleware/NemaGFX/templates/` directory.
 
-Refer to ST's STM32N6570-DK or TouchGFX/LVGL GPU examples for working HAL implementations.
+The companion crate **`nema-gfx-hal`** (in this repository) ships an adapted bare-metal HAL plus an optional GPU2D stub for link tests. On hardware, initialize GPU2D clocks, call `HAL_GPU2D_Init` from STM32Cube, disable the `stub` feature, and link the real Cube GPU2D driver.
+
+### Smoke example
+
+```bash
+cargo run --release --bin stm32-bindings-gen -- --module nema_gfx
+cargo build --manifest-path examples/nema-gfx-smoke/Cargo.toml
+```
+
+`examples/nema-gfx-smoke` runs `nema_init`, binds a 64×64 framebuffer, issues `nema_clear` via a command list, and links against the M55 NemaGFX archive. With the default GPU2D stub it validates the API/link path in CI; flash to an STM32N6 board only after replacing the stub with Cube HAL init.
+
+Refer to ST's STM32N6570-DK examples under `x-cube-image-processing/STM32N6570-DK/` for full clock, memory, and display setup.
 
 ## Fetching / updating vendored files
 
