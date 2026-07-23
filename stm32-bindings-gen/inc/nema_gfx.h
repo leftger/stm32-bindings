@@ -11,6 +11,9 @@ extern "C" {
 
 /* Core 2.5D raster API */
 #include "nema_core.h"
+#include "nema_raster.h"
+#include "nema_error.h"
+#include "nema_provisional.h"
 
 /* Vector graphics (NeoChromVG on supported parts) */
 #include "nema_vg.h"
