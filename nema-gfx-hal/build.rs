@@ -2,6 +2,17 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
+    println!("cargo:rerun-if-changed=c/");
+    println!("cargo:rerun-if-changed=include/");
+
+    // `bump_alloc.c` defines global `malloc`/`free` overrides, which is only
+    // safe on the bare-metal target this HAL is meant for. Skip the C shim
+    // entirely on the host (e.g. `cargo test --workspace`), where it would
+    // hijack the host allocator and crash the test binary.
+    if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("none") {
+        return;
+    }
+
     let manifest_dir = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
     let include = manifest_dir.join("include");
     let nema_include = manifest_dir
@@ -24,7 +35,4 @@ fn main() {
     }
 
     build.compile("nema_gfx_hal");
-
-    println!("cargo:rerun-if-changed=c/");
-    println!("cargo:rerun-if-changed=include/");
 }
