@@ -35,6 +35,12 @@ void HAL_GPU2D_WriteRegister(GPU2D_HandleTypeDef *handle, uint32_t reg, uint32_t
     UNUSED(value);
 }
 
+void HAL_GPU2D_PollCompletion(GPU2D_HandleTypeDef *handle)
+{
+    /* Stub never completes anything; nothing to poll. */
+    UNUSED(handle);
+}
+
 int nema_gfx_hal_gpu2d_init(void)
 {
     return HAL_GPU2D_Init(&hgpu2d) == HAL_OK ? 0 : -1;

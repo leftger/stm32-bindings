@@ -49,6 +49,7 @@ int32_t nema_sys_init(void)
 
 int nema_wait_irq(void)
 {
+    HAL_GPU2D_PollCompletion(&hgpu2d);
     return 0;
 }
 
