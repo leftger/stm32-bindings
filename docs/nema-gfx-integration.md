@@ -55,7 +55,7 @@ The companion crate **`nema-gfx-hal`** (in this repository) ships an adapted bar
 
 ```bash
 cargo run --release --bin stm32-bindings-gen -- --module nema_gfx
-cargo build --manifest-path examples/nema-gfx-smoke/Cargo.toml
+cd examples/nema-gfx-smoke && cargo build
 ```
 
 `examples/nema-gfx-smoke` runs `nema_init`, binds a 64×64 framebuffer, issues `nema_clear` via a command list, and links against the M55 NemaGFX archive. With the default GPU2D stub it validates the API/link path in CI; flash to an STM32N6 board only after replacing the stub with Cube HAL init.
