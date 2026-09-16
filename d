@@ -4,13 +4,13 @@ set -e
 cd $(dirname $0)
 
 CMD=$1
-WBA_REV=v1.9.0
+WBA_REV=v1.10.0
 WB_REV=v1.24.0
 shift
 
 case "$CMD" in
     gen)
-        cargo run --release stm32-bindings-gen
+        cargo run --release --bin stm32-bindings-gen
     ;;
     download-all)
         rm -rf ./sources

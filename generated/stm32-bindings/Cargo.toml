@@ -1,6 +1,6 @@
 [package]
 name = "stm32-bindings"
-version = "$VERSION$"
+version = "0.2.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/embassy-rs/stm32-bindings"

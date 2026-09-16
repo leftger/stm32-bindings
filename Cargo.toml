@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "stm32-bindings-gen",
+    "generated/stm32-bindings",
 ]
 exclude = [
     "build"

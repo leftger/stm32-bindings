@@ -10,3 +10,4 @@ out/
 **/.idea
 sources
 build
+generated/thread
