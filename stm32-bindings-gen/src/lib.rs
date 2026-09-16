@@ -391,7 +391,7 @@ impl Gen {
         self.write_bytes("README.md", include_bytes!("../res/README.md"));
         self.write_bytes(
             "Cargo.toml",
-            str::from_utf8(include_bytes!("../res/Cargo.toml"))
+            str::from_utf8(include_bytes!("../res/Cargo.toml.in"))
                 .unwrap()
                 .replace("$VERSION$", env!("CARGO_PKG_VERSION"))
                 .as_bytes(),
