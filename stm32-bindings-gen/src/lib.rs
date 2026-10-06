@@ -270,7 +270,11 @@ const BINDING_SPECS: &[BindingSpec] = &[
         root: Directory::Vendored("venc"),
         target_triple: "thumbv8m.main-none-eabihf",
         include_dirs: &["include"],
-        clang_args: &["-mcpu=cortex-m55"],
+        // `arm-none-eabi-gcc` defaults to -fshort-enums (the ARM EABI packs
+        // enums into the smallest container), so bindgen must be told the same
+        // or every struct containing an enum gets 4-byte members and all the
+        // fields after them end up at the wrong offset.
+        clang_args: &["-mcpu=cortex-m55", "-fshort-enums"],
         allowlist: &[],
         aliases: &[],
         library_artifacts: &[LibraryArtifact {
