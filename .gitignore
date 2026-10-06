@@ -11,3 +11,4 @@ out/
 sources
 build
 stm32-bindings-gen/nema_gfx
+stm32-bindings-gen/venc
