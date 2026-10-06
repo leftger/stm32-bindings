@@ -67,6 +67,7 @@ wba_wpan_openthread = []
 wb_wpan_openthread = []
 n6_ai_runtime = []
 nema_gfx = []
+venc = []
 
 # Build the actual PAC. Set by default.
 # If you just want the metadata, unset it with `default-features = false`. 
@@ -120,3 +121,9 @@ neochrom-m33-revc = ["nema_gfx", "lib_nemagfx_cortex_m33_revc_float_abi_hard"]
 neochrom-m33-nemapvg = ["nema_gfx", "lib_nemagfx_cortex_m33_nemapvg_float_abi_hard"]
 neochrom-m7 = ["nema_gfx", "lib_nemagfx_cortex_m7_float_abi_hard"]
 neochrom-m55 = ["nema_gfx", "lib_nemagfx_cortex_m55_float_abi_hard"]
+
+# STM32N6 Video Encoder (Hantro H.264 + JPEG) prebuilt library.
+lib_venc_cortex_m55_float_abi_hard = []
+
+# VENC preset (module + matching prebuilt library). N6 is Cortex-M55 only.
+venc-m55 = ["venc", "lib_venc_cortex_m55_float_abi_hard"]

@@ -263,6 +263,21 @@ const BINDING_SPECS: &[BindingSpec] = &[
             destination: "src/lib/nema_gfx",
         }],
     },
+    BindingSpec {
+        module: "venc",
+        feature: Some("venc"),
+        header: "stm32-bindings-gen/inc/venc.h",
+        root: Directory::Vendored("venc"),
+        target_triple: "thumbv8m.main-none-eabihf",
+        include_dirs: &["include"],
+        clang_args: &["-mcpu=cortex-m55"],
+        allowlist: &[],
+        aliases: &[],
+        library_artifacts: &[LibraryArtifact {
+            source: "lib",
+            destination: "src/lib/venc",
+        }],
+    },
 ];
 
 #[derive(Debug)]
